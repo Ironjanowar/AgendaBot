@@ -16,12 +16,16 @@ bot.skip_pending = True
 
 # Check used files
 if not path.isfile("./data/todolist.json"):
-    print("Error: \"./data/todolist.json\" not found!")
-    sys.exit(1)
+    with open('./data/todolist.json', 'w') as data:
+        data.write('{}')
+        data.close
+    print("./data/todolist.json created")
 
 if not path.isfile("./data/procastinationlist.json"):
-    print("Error: \"./data/procastinationlist.json\" not found!")
-    sys.exit(1)
+    with open('./data/procastinationlist.json', 'w') as data:
+        data.write('{}')
+        data.close
+    print("./data/procastinationlist.json created")
 
 # Globals (I'm sorry)
 global todolist
