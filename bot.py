@@ -1,11 +1,11 @@
 import telebot
 import sys
-import os.path as path
+import os
 import json
 from telebot import types
 
 # Create bot with its token
-if not path.isfile("bot.token"):
+if not os.path.isfile("bot.token"):
     print("Error: \"bot.token\" not found!")
     sys.exit(1)
 
@@ -15,18 +15,23 @@ with open("./bot.token", "r") as TOKEN:
 # Ignorar mensajes antiguos
 bot.skip_pending = True
 
+# Check data dir
+if not os.path.exists("./data"):
+    os.makedirs("./data")
+    print("./data created")
+
 # Check used files
-if not path.isfile("./data/todolist.json"):
+if not os.path.isfile("./data/todolist.json"):
     with open('./data/todolist.json', 'w') as data:
         data.write('{}')
         data.close
-    print("./data/todolist.json created")
+        print("./data/todolist.json created")
 
-if not path.isfile("./data/procastinationlist.json"):
+if not os.path.isfile("./data/procastinationlist.json"):
     with open('./data/procastinationlist.json', 'w') as data:
         data.write('{}')
         data.close
-    print("./data/procastinationlist.json created")
+        print("./data/procastinationlist.json created")
 
 
 # Handlers
@@ -48,10 +53,11 @@ def addtodo(m):
         todofile = open("./data/todolist.json")
         todolist = json.load(todofile)
         # Check existance
-        if not cid in todolist:
+        if cid not in todolist:
             todolist[cid] = []
         toadd = text[1]
         todolist[cid].append(toadd)
+        # Write in file
         json.dump(todolist, open("./data/todolist.json", "w"))
         bot.reply_to(m, "*" + toadd + "* added!", parse_mode="Markdown")
         todofile.close()
@@ -67,7 +73,7 @@ def addprocastination(m):
         procastinationfile = open("./data/procastinationlist.json")
         procastinationlist = json.load(procastinationfile)
         # Check existance
-        if not cid in procastinationlist:
+        if cid not in procastinationlist:
             procastinationlist[cid] = []
         toadd = text[1]
         procastinationlist[cid].append(toadd)
@@ -84,8 +90,8 @@ def procastinate(m):
     procastinationlist = json.load(procastinationfile)
     # Check existance
     if not cid in procastinationlist:
-            procastinationlist[cid] = []
-    # Check list
+        procastinationlist[cid] = []
+        # Check list
     if not procastinationlist[cid]:
         bot.send_message(m.chat.id, "Well... It seems like you gotta keep working, your *procastination list* is *empty*!", parse_mode="Markdown")
         return
@@ -102,9 +108,9 @@ def todo(m):
     todofile = open("./data/todolist.json")
     todolist = json.load(todofile)
     # Check existance
-    if not cid in todolist:
-            todolist[cid] = []
-    # Check list
+    if cid not in todolist:
+        todolist[cid] = []
+        # Check list
     if not todolist[cid]:
         bot.send_message(m.chat.id, "*Congrats!* Your TO DO list is empty!", parse_mode="Markdown")
         return
@@ -143,7 +149,7 @@ def catch_no(c):
 
 
 @bot.message_handler(commands=['removeallprocastination'])
-def removealltodo(m):
+def removeallprocastination(m):
     # Creating keyboard
     markup = types.InlineKeyboardMarkup()
     # Creating buttons
@@ -155,7 +161,7 @@ def removealltodo(m):
 
 
 @bot.callback_query_handler(func=lambda callback: callback.data == "YesProcast")
-def catch_si(c):
+def catch_si_procast(c):
     todofile = open("./data/procastinationlist.json")
     todolist = json.load(todofile)
     cid = str(c.from_user.id)
@@ -166,13 +172,55 @@ def catch_si(c):
 
 
 @bot.callback_query_handler(func=lambda callback: callback.data == "NoProcast")
-def catch_no(c):
+def catch_no_procast(c):
     bot.edit_message_text("*Canceled* /removeallprocastination", chat_id=c.message.chat.id, message_id=c.message.message_id, parse_mode="Markdown")
 
-    
+
 # TODO: Remove procastination
 
 # TODO: Remove todo element
+@bot.message_handler(commands=["removetodo", "todoremove"])
+def removetodo(m):
+    cid = str(m.from_user.id)
+    todofile = open("./data/todolist.json")
+    todolist = json.load(todofile)
+    # Creating keyboard
+    markup = types.InlineKeyboardMarkup()
+    # Fill keyboard
+    for element in todolist[cid]:
+        buttontext = element[:20] + '...' if len(element) > 20 else element
+        button = types.InlineKeyboardButton(buttontext, callback_data=element)
+        markup.add(button)
+    button = types.InlineKeyboardButton("Done!", callback_data="done")
+    markup.add(button)
+    bot.reply_to(m, "Select an element to remove:", reply_markup=markup)
+    todofile.close()
+
+
+@bot.callback_query_handler(func=lambda callback: callback.data in json.load(open("./data/todolist.json"))[str(callback.from_user.id)])
+def catch_todo(c):
+    cid = str(c.from_user.id)
+    todofile = open("./data/todolist.json")
+    todolist = json.load(todofile)
+    todolist[cid].remove(c.data)
+    # Creating keyboard
+    markup = types.InlineKeyboardMarkup()
+    # Fill keyboard
+    for element in todolist[cid]:
+        buttontext = element[:20] + '...' if len(element) > 20 else element
+        button = types.InlineKeyboardButton(buttontext, callback_data=element)
+        markup.add(button)
+    button = types.InlineKeyboardButton("Done!", callback_data="done")
+    markup.add(button)
+    # Write in file
+    json.dump(todolist, open("./data/todolist.json", "w"))
+    todofile.close()
+    bot.edit_message_reply_markup(chat_id=c.message.chat.id, message_id=c.message.message_id, reply_markup=markup)
+
+
+@bot.callback_query_handler(func=lambda callback: callback.data == "done")
+def catch_done(c):
+    bot.edit_message_text("*Done!*", chat_id=c.message.chat.id, message_id=c.message.message_id, parse_mode="Markdown")
 
 # Start the bot
 print("Running...")
