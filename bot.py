@@ -72,7 +72,6 @@ def addprocastination(m):
         toadd = text[1]
         procastinationlist[cid].append(toadd)
         json.dump(procastinationlist, open("./data/procastinationlist.json", "w"))
-        print(json.load(open("./data/procastinationlist.json"))) # DEBUG
         bot.reply_to(m, "*" + toadd + "* added!", parse_mode="Markdown")
         procastinationfile.close()
 
@@ -86,8 +85,6 @@ def procastinate(m):
     # Check existance
     if not cid in procastinationlist:
             procastinationlist[cid] = []
-
-    print(procastinationlist) # DEBUG
     # Check list
     if not procastinationlist[cid]:
         bot.send_message(m.chat.id, "Well... It seems like you gotta keep working, your *procastination list* is *empty*!", parse_mode="Markdown")
