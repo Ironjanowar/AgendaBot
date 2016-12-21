@@ -177,8 +177,6 @@ def catch_no(c):
 
 # TODO: Remove todo element
 
-# TODO: Multiuser lists
-
 # Start the bot
 print("Running...")
 bot.polling()
