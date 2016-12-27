@@ -1,0 +1,25 @@
+This is a bot programmed on Python thanks to this [[https://github.com/eternnoir/pyTelegramBotAPI/tree/02c22c990b1affe9d43d8920f6b53fa10c38a82e][API]] offered by [[https://github.com/eternnoir][@eternnoir]].
+
+* Installation and usage
+- Install the [[https://github.com/eternnoir/pyTelegramBotAPI#getting-started][dependencies]]
+#+BEGIN_SRC bash
+  $ pip install pyTelegramBotAPI
+#+END_SRC
+
+- Clone the repository
+#+BEGIN_SRC bash
+   $ git clone https://github.com/Ironjanowar/TheConvertorBot.git
+   $ cd TheConvertorBot
+#+END_SRC
+
+- Create a file named *convertor.token* with your token on it.
+#+BEGIN_SRC bash
+  $ echo "TOKEN" > convertor.token
+#+END_SRC
+
+*NOTE:* Get your own /token/ [[https://core.telegram.org/bots][here]].
+
+- Run the bot
+#+BEGIN_SRC bash
+  $ ./run.sh
+#+END_SRC
