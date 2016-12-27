@@ -178,7 +178,7 @@ def catch_no_procast(c):
 
 # TODO: Remove procastination
 
-# TODO: Remove todo element
+# Remove todo element
 @bot.message_handler(commands=["removetodo", "todoremove"])
 def removetodo(m):
     cid = str(m.from_user.id)

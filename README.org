@@ -23,3 +23,7 @@ This is a bot programmed on Python thanks to this [[https://github.com/eternnoir
 #+BEGIN_SRC bash
   $ ./run.sh
 #+END_SRC
+
+* TODO
+  - Add remove procastination
+  - Add /removetodo and /removeprocastination to commands in botfather
